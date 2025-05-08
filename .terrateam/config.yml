@@ -1,0 +1,56 @@
+################################################################################
+# Dirspace
+# https://docs.terrateam.io/getting-started/concepts/#dirspace
+################################################################################
+dirs:
+  # STAGING
+  infra/staging/:
+    when_modified:
+      file_patterns: ["${DIR}/*.tf"]
+      autoapply: true
+    tags: ["staging"]
+  # PRODUCTION
+  infra/prod/:
+    when_modified:
+      file_patterns: ["${DIR}/*.tf"]
+      autoapply: true
+    tags: ["prod"]
+
+
+################################################################################
+# Workflows
+# https://docs.terrateam.io/how-it-works#workflow
+################################################################################
+workflows:
+  # STAGING
+  - tag_query: "staging"
+    plan:
+      # prepare env
+      - type: run
+        cmd: ['echo', 'Custom pre-plan step for staging compute...']
+      - type: env
+        name: TF_VAR_foo
+        cmd: ['echo', 'bar']
+      # run init
+      - type: init
+      - type: plan
+      # clean up
+      # - type: run
+      #   cmd: ['${TERRATEAM_ROOT}/scripts/run-after-plan.sh']
+    apply:
+      - type: run
+        cmd: ['echo', 'About to apply staging changes...']
+      - type: init
+      - type: apply
+  # PRODUCTION
+  - tag_query: "prod"
+    plan:
+      - type: run
+        cmd: ['echo', 'Planning for production compute...']
+      - type: init
+      - type: plan
+    apply:
+      - type: run
+        cmd: ['echo', 'Applying production changes...']
+      - type: init
+      - type: apply
