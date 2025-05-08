@@ -14,5 +14,5 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = "j22labs.meow"
+  bucket = "j22labs.meowmeow"
 }
